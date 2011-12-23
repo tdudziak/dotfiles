@@ -60,5 +60,5 @@ call matchadd("WhitespaceFauxPas", "\\s\\+$")
 set colorcolumn=80,100
 
 " Keyword lookup on Shift-K with Hoogle
-autocmd FileType haskell set keywordprg=hoogle
-autocmd FileType lhaskell set keywordprg=hoogle
+autocmd FileType haskell setlocal keywordprg=hoogle
+autocmd FileType lhaskell setlocal keywordprg=hoogle
