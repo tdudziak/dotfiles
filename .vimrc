@@ -56,8 +56,26 @@ endif
 
 " Warn about trailing whitespace and tabs.
 highlight WhitespaceFauxPas ctermbg=Red guibg=tomato
-call matchadd("WhitespaceFauxPas", "\t")
-call matchadd("WhitespaceFauxPas", "\\s\\+$")
+let g:tab_warn_match = matchadd("WhitespaceFauxPas", "\t")
+
+function! DisableTabHighlightsOnCFiles()
+    if &filetype == 'c'
+        call matchdelete(g:tab_warn_match)
+    else
+        "let g:tab_warn_match = matchadd("WhitespaceFauxPas", "\t")
+    endif
+endfunction
+
+augroup vimrc_autocmds
+autocmd!
+
+autocmd BufEnter * call DisableTabHighlightsOnCFiles()
+autocmd FileType c setlocal noexpandtab
+
+" Highlight trailing whitespace when outside mode.
+let trailspace_match = matchadd("WhitespaceFauxPas", "\\s\\+$")
+autocmd InsertLeave * let trailspace_match = matchadd("WhitespaceFauxPas", "\\s\\+$")
+autocmd InsertEnter * call matchdelete(trailspace_match)
 
 " Mark 80 and 100 column.
 set colorcolumn=80,100
