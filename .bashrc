@@ -107,4 +107,8 @@ ANDROID_HOME=$HOME/android
 export PATH+=:$ANDROID_HOME/tools:$ANDROID_HOME/platform_tools
 sanity_check "$ANDROID_HOME/tools/android" "android"
 
+# Support http://www.catb.org/~esr/BROWSER/
+export BROWSER=/usr/bin/google-chrome
+sanity_check "$BROWSER" "chrome"
+
 unset sanity_check
