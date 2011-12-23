@@ -11,9 +11,10 @@ set incsearch           " do incremental searching
 set hlsearch
 set autoindent
 set number
+set showmatch
 
 " Ignore case on search unless I typed a capital letter explicitly.
-set ignorecase 
+set ignorecase
 set smartcase
 
 syntax on
@@ -30,6 +31,8 @@ if !exists(":DiffOrig")
   command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
 		  \ | wincmd p | diffthis
 endif
+
+filetype plugin indent on
 
 " This seems to be the most widely chosen combination (and standard in Python).
 set tabstop=4
