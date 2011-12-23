@@ -50,3 +50,11 @@ if v:progname =~? "gvim"
     set guioptions-=m
     set guioptions-=T
 endif
+
+" Warn about trailing whitespace and tabs.
+highlight WhitespaceFauxPas ctermbg=Red guibg=tomato
+call matchadd("WhitespaceFauxPas", "\t")
+call matchadd("WhitespaceFauxPas", "\\s\\+$")
+
+" Mark 80 and 100 column.
+set colorcolumn=80,100
