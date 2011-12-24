@@ -54,10 +54,22 @@ if v:progname =~? "gvim"
     set guioptions-=T
 endif
 
-" Warn about trailing whitespace and tabs.
+augroup vimrc_autocmds
+autocmd!
+
+" Sometimes we want old-school tabs.
+function! SetOldSchoolTabs()
+    setlocal noexpandtab
+    setlocal tabstop=8
+    setlocal shiftwidth=8
+endfunction
+autocmd FileType c call SetOldSchoolTabs()
+
+" Highlight trailing whitespace when outside insert mode.
 highlight WhitespaceFauxPas ctermbg=Red guibg=tomato
-call matchadd("WhitespaceFauxPas", "\t")
-call matchadd("WhitespaceFauxPas", "\\s\\+$")
+let trailspace_match = matchadd("WhitespaceFauxPas", "\\s\\+$")
+autocmd InsertLeave * let trailspace_match = matchadd("WhitespaceFauxPas", "\\s\\+$")
+autocmd InsertEnter * call matchdelete(trailspace_match)
 
 " Mark 80 and 100 column.
 set colorcolumn=80,100
