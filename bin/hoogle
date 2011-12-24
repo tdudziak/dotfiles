@@ -6,8 +6,7 @@ from urllib import urlencode
 
 def main():
     if len(argv) != 2:
-        print('Usage: %s <keyword>' % argv[0])
-        exit(-1)
+        exit('Usage: %s <keyword>' % argv[0])
 
     url = 'http://haskell.org/hoogle?' + urlencode([('hoogle', argv[1])])
     webbrowser.open(url)
