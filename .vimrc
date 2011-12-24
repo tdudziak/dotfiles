@@ -54,25 +54,19 @@ if v:progname =~? "gvim"
     set guioptions-=T
 endif
 
-" Warn about trailing whitespace and tabs.
-highlight WhitespaceFauxPas ctermbg=Red guibg=tomato
-let g:tab_warn_match = matchadd("WhitespaceFauxPas", "\t")
-
-function! DisableTabHighlightsOnCFiles()
-    if &filetype == 'c'
-        call matchdelete(g:tab_warn_match)
-    else
-        "let g:tab_warn_match = matchadd("WhitespaceFauxPas", "\t")
-    endif
-endfunction
-
 augroup vimrc_autocmds
 autocmd!
 
-autocmd BufEnter * call DisableTabHighlightsOnCFiles()
-autocmd FileType c setlocal noexpandtab
+" Sometimes we want old-school tabs.
+function! SetOldSchoolTabs()
+    setlocal noexpandtab
+    setlocal tabstop=8
+    setlocal shiftwidth=8
+endfunction
+autocmd FileType c call SetOldSchoolTabs()
 
-" Highlight trailing whitespace when outside mode.
+" Highlight trailing whitespace when outside insert mode.
+highlight WhitespaceFauxPas ctermbg=Red guibg=tomato
 let trailspace_match = matchadd("WhitespaceFauxPas", "\\s\\+$")
 autocmd InsertLeave * let trailspace_match = matchadd("WhitespaceFauxPas", "\\s\\+$")
 autocmd InsertEnter * call matchdelete(trailspace_match)
