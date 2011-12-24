@@ -63,7 +63,7 @@ function! SetOldSchoolTabs()
     setlocal tabstop=8
     setlocal shiftwidth=8
 endfunction
-autocmd FileType c call SetOldSchoolTabs()
+autocmd FileType c\|\(go\) call SetOldSchoolTabs()
 
 " Highlight trailing whitespace when outside insert mode.
 highlight WhitespaceFauxPas ctermbg=Red guibg=tomato
@@ -77,3 +77,7 @@ set colorcolumn=80,100
 " Keyword lookup on Shift-K with Hoogle
 autocmd FileType haskell setlocal keywordprg=hoogle
 autocmd FileType lhaskell setlocal keywordprg=hoogle
+
+" Include Go stuff (syntax, filetype, ...)
+set rtp+=$GOROOT/misc/vim
+autocmd BufReadPre,BufNewFile *.go set filetype=go fileencoding=utf-8 fileencodings=utf-8
