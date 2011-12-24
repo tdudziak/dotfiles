@@ -104,7 +104,7 @@ sanity_check "$GOROOT/bin/8g" "go"
 
 # Android platform
 ANDROID_HOME=$HOME/android
-export PATH+=:$ANDROID_HOME/tools:$ANDROID_HOME/platform_tools
+export PATH+=:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
 sanity_check "$ANDROID_HOME/tools/android" "android"
 
 # Support http://www.catb.org/~esr/BROWSER/
