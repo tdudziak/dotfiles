@@ -73,6 +73,7 @@ autocmd InsertEnter * call matchdelete(trailspace_match)
 
 " Mark 80 and 100 column.
 set colorcolumn=80,100
+highlight ColorColumn ctermbg=Black
 
 " Keyword lookup on Shift-K with Hoogle
 autocmd FileType haskell setlocal keywordprg=hoogle
