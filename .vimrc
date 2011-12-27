@@ -67,9 +67,9 @@ autocmd FileType c\|\(go\) call SetOldSchoolTabs()
 
 " Highlight trailing whitespace when outside insert mode.
 highlight WhitespaceFauxPas ctermbg=Red guibg=tomato
-let trailspace_match = matchadd("WhitespaceFauxPas", "\\s\\+$")
-autocmd InsertLeave * let trailspace_match = matchadd("WhitespaceFauxPas", "\\s\\+$")
-autocmd InsertEnter * call matchdelete(trailspace_match)
+autocmd BufReadPre  * let b:trailspace_match = matchadd("WhitespaceFauxPas", "\\s\\+$")
+autocmd InsertLeave * let b:trailspace_match = matchadd("WhitespaceFauxPas", "\\s\\+$")
+autocmd InsertEnter * call matchdelete(b:trailspace_match)
 
 " Mark 80 and 100 column.
 set colorcolumn=80,100
