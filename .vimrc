@@ -69,20 +69,20 @@ autocmd FileType c\|\(go\) call SetOldSchoolTabs()
 highlight WhitespaceFauxPas ctermbg=Red guibg=tomato
 
 function! WhitespaceFauxPasEnable()
-    if !exists('g:trailspace_match')
-        let g:trailspace_match = matchadd("WhitespaceFauxPas", "\\s\\+$")
+    if !exists('w:trailspace_match')
+        let w:trailspace_match = matchadd("WhitespaceFauxPas", "\\s\\+$")
     endif
 endfunction
 
 function! WhitespaceFauxPasDisable()
-    if exists('g:trailspace_match')
-        call matchdelete(g:trailspace_match)
-        unlet g:trailspace_match
+    if exists('w:trailspace_match')
+        call matchdelete(w:trailspace_match)
+        unlet w:trailspace_match
     endif
 endfunction
 
 if has('gui_running')
-    call WhitespaceFauxPasEnable()
+    autocmd WinEnter    * call WhitespaceFauxPasEnable()
     autocmd InsertLeave * call WhitespaceFauxPasEnable()
     autocmd InsertEnter * call WhitespaceFauxPasDisable()
 endif
