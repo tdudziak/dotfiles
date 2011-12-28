@@ -87,6 +87,9 @@ if has('gui_running')
     autocmd InsertEnter * call WhitespaceFauxPasDisable()
 endif
 
+" Enable spell checking by default on git commits.
+autocmd FileType gitcommit setlocal spell
+
 " Mark 80 and 100 column.
 set colorcolumn=80,100
 highlight ColorColumn ctermbg=Black
