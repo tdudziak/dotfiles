@@ -47,7 +47,7 @@ map <silent> <leader><cr> :noh<cr>
 map <silent> <leader>s :set invspell<cr>
 map <silent> <leader>n :set invnu<cr>
 
-if v:progname =~? "gvim"
+if has('gui_running')
     set background=light
     colorscheme solarized
     set guioptions-=m
@@ -67,9 +67,25 @@ autocmd FileType c\|\(go\) call SetOldSchoolTabs()
 
 " Highlight trailing whitespace when outside insert mode.
 highlight WhitespaceFauxPas ctermbg=Red guibg=tomato
-autocmd BufReadPre  * let b:trailspace_match = matchadd("WhitespaceFauxPas", "\\s\\+$")
-autocmd InsertLeave * let b:trailspace_match = matchadd("WhitespaceFauxPas", "\\s\\+$")
-autocmd InsertEnter * call matchdelete(b:trailspace_match)
+
+function! WhitespaceFauxPasEnable()
+    if !exists('g:trailspace_match')
+        let g:trailspace_match = matchadd("WhitespaceFauxPas", "\\s\\+$")
+    endif
+endfunction
+
+function! WhitespaceFauxPasDisable()
+    if exists('g:trailspace_match')
+        call matchdelete(g:trailspace_match)
+        unlet g:trailspace_match
+    endif
+endfunction
+
+if has('gui_running')
+    call WhitespaceFauxPasEnable()
+    autocmd InsertLeave * call WhitespaceFauxPasEnable()
+    autocmd InsertEnter * call WhitespaceFauxPasDisable()
+endif
 
 " Mark 80 and 100 column.
 set colorcolumn=80,100
