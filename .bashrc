@@ -46,12 +46,12 @@ fi
 function __git_ps1_color {
     status=$(git status --porcelain 2> /dev/null)
     if $(echo "$status" | egrep "^\?\?" > /dev/null); then
-        echo -en '\033[0;31m' # red: changes not in index
+        tput setaf 1 # red: changes not in index
     elif $(echo "$status" | egrep "^\w?A|M|D" > /dev/null); then
-        echo -en '\033[0;32m' # green: changes in index
+        tput setaf 2 # green: changes in index
     fi
     __git_ps1
-    echo -en '\033[m' # text reset
+    tput sgr0 # text reset
 }
 
 if [ "$color_prompt" = yes ]; then
