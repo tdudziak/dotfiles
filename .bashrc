@@ -119,6 +119,10 @@ ANDROID_HOME=$HOME/android
 export PATH+=:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
 sanity_check "$ANDROID_HOME/tools/android" "android"
 
+# Google C++ Testing Framework
+GTEST_DIR="$HOME/src/gtest-1.6.0"
+sanity_check "$GTEST_DIR/include/gtest/gtest.h"
+
 # Support http://www.catb.org/~esr/BROWSER/
 export BROWSER=/usr/bin/google-chrome
 sanity_check "$BROWSER" "chrome"
