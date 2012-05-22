@@ -17,8 +17,9 @@ myManageHook = composeAll (
     ])
 
 myKeys config = Map.fromList [
-          ((mod1Mask, xK_F4),       kill)
-        , ((mod1Mask, xK_grave),    sendMessage ToggleLayout)
+          ((mod1Mask, xK_F4), kill)
+        , ((mod1Mask, xK_grave), sendMessage ToggleLayout)
+        , ((mod1Mask .|. shiftMask, xK_t), spawn "trac report/2")
     ]
 
 myLayout =
