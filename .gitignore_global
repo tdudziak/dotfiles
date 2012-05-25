@@ -22,3 +22,4 @@
 # VIM backups and swapfiles #
 *~
 *.swp
+*.swo
