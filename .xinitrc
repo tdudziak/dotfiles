@@ -19,6 +19,7 @@ export VDPAU_NVIDIA_NO_OVERLAY=1
 
 setxkbmap pl
 xsetroot -cursor_name left_ptr
+xmodmap -e "keycode 133 = Multi_key" # map Super_L as compose key
 
 # exec gnome-session
 # exec startkde
