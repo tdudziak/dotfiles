@@ -105,23 +105,23 @@ function sanity_check {
 export PATH+=:$HOME/bin:$HOME/.cabal/bin
 
 # TVLA environment and settings
-export TVLA_HOME=$HOME/src/tvla-3.0alpha
-export PATH+=:$TVLA_HOME/bin
-sanity_check "$TVLA_HOME/bin/tvla" "tvla"
+# export TVLA_HOME=$HOME/src/tvla-3.0alpha
+# export PATH+=:$TVLA_HOME/bin
+# sanity_check "$TVLA_HOME/bin/tvla" "tvla"
 
 # Go programming language environment
-export GOROOT=$HOME/go
-export PATH=$PATH:$GOROOT/bin
-sanity_check "$GOROOT/bin/8g" "go"
+# export GOROOT=$HOME/go
+# export PATH=$PATH:$GOROOT/bin
+# sanity_check "$GOROOT/bin/8g" "go"
 
 # Android platform
-ANDROID_HOME=$HOME/android
-export PATH+=:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
-sanity_check "$ANDROID_HOME/tools/android" "android"
+# ANDROID_HOME=$HOME/android
+# export PATH+=:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
+# sanity_check "$ANDROID_HOME/tools/android" "android"
 
 # Google C++ Testing Framework
-export GTEST_DIR="$HOME/src/gtest-1.6.0"
-sanity_check "$GTEST_DIR/include/gtest/gtest.h"
+# export GTEST_DIR="$HOME/src/gtest-1.6.0"
+# sanity_check "$GTEST_DIR/include/gtest/gtest.h"
 
 # Support http://www.catb.org/~esr/BROWSER/
 export BROWSER=/usr/bin/google-chrome
