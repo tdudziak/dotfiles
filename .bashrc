@@ -50,12 +50,10 @@ function __git_ps1_color {
     elif $(echo "$status" | egrep "^\w?A|M|D" > /dev/null); then
         tput setaf 2 # green: changes in index
     fi
-    __git_ps1
-    tput sgr0 # text reset
 }
 
 if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]`__git_ps1_color`\$ '
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\[$(__git_ps1_color)\]$(__git_ps1)\[$(tput sgr0)\]\$ '
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w`__git_ps1`\$ '
 fi
