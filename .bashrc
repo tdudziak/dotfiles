@@ -128,3 +128,5 @@ export BROWSER=/usr/bin/google-chrome
 sanity_check "$BROWSER" "chrome"
 
 unset sanity_check
+
+export EDITOR=vim
