@@ -95,9 +95,11 @@ set colorcolumn=80,100
 highlight ColorColumn ctermbg=Black
 
 " Keyword lookup on Shift-K with Hoogle
-autocmd FileType haskell setlocal keywordprg=hoogle
-autocmd FileType lhaskell setlocal keywordprg=hoogle
+autocmd FileType haskell setlocal keywordprg=hoogle\ --info
+autocmd FileType lhaskell setlocal keywordprg=hoogle\ --info
 
 " Include Go stuff (syntax, filetype, ...)
 set rtp+=$GOROOT/misc/vim
 autocmd BufReadPre,BufNewFile *.go set filetype=go fileencoding=utf-8 fileencodings=utf-8
+
+set cmdheight=2
