@@ -1,4 +1,4 @@
-" No need for vi compatibility...
+" Basics {{{
 set nocompatible
 
 " allow backspacing over everything in insert mode
@@ -10,82 +10,112 @@ set showcmd             " display incomplete commands
 set incsearch           " do incremental searching
 set hlsearch
 set autoindent
-set number
+set relativenumber
 set showmatch
+set mouse=a
+syntax on
 
 " Ignore case on search unless I typed a capital letter explicitly.
 set ignorecase
 set smartcase
 
-syntax on
+set exrc            " enable per-directory .vimrc files
+set secure          " disable unsafe commands in local .vimrc files
+" }}}
 
-" In many terminal emulators the mouse works just fine, thus enable it.
-if has('mouse')
-  set mouse=a
-endif
-
-" Convenient command to see the difference between the current buffer and the
-" file it was loaded from, thus the changes you made.
-" Only define it when not defined already.
-if !exists(":DiffOrig")
-  command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
-		  \ | wincmd p | diffthis
-endif
-
+" Vundle setup and plugins {{{
+filetype off
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+Plugin 'gmarik/Vundle.vim'
+Plugin 'tpope/vim-fugitive'
+Plugin 'kien/ctrlp.vim'
+Plugin 'altercation/vim-colors-solarized.git'
+call vundle#end()
 filetype plugin indent on
+" }}}
 
-" This seems to be the most widely chosen combination (and standard in Python).
-set tabstop=4
-set shiftwidth=4
-set expandtab
+" YouCompleteMe setup {{{
+" use the Debian package
+set rtp+=/usr/share/vim-youcompleteme/
+let g:ycm_auto_trigger=0
+let g:ycm_enable_diagnostic_signs=0
+" }}}
 
-" Muscle memory from web browser
-map <C-T> :tabnew<Enter>
-
-let mapleader = ","
-map <silent> <leader><cr> :noh<cr>
-map <silent> <leader>s :set invspell<cr>
-map <silent> <leader>n :set invnu<cr>
-
-if has('gui_running')
+if has('gui_running') " {{{
     set background=light
     colorscheme solarized
     set guioptions-=m
     set guioptions-=T
-endif
+    set guifont=DejaVu\ Sans\ Mono\ 10
+endif " }}}
 
-augroup vimrc_autocmds
-autocmd!
+" Tabs and indentation setup {{{
+" default to Python standard
+set tabstop=4
+set shiftwidth=4
+set expandtab
 
-" Sometimes we want old-school tabs.
+" Sometimes we want old-school tabs (like in the Linux Kernel coding style)
 function! SetOldSchoolTabs()
     setlocal noexpandtab
     setlocal tabstop=8
     setlocal shiftwidth=8
 endfunction
-autocmd FileType c\|\(go\) call SetOldSchoolTabs()
+" Enable old-school tabs for C
+autocmd FileType c call SetOldSchoolTabs()
+" }}}
 
-" Highlight trailing whitespace when outside insert mode.
-highlight WhitespaceFauxPas ctermbg=Red guibg=tomato
+" Fold helper for C an C++ {{{
+"
+" Rather than using foldmethod=syntax, folds are created manually according to
+" certian rules.
+python <<endpython
+def create_c_folds():
+    import vim
 
-function! WhitespaceFauxPasEnable()
-    if !exists('w:trailspace_match')
-        let w:trailspace_match = matchadd("WhitespaceFauxPas", "\\s\\+$")
-    endif
-endfunction
+    def get_fold_starts():
+        for (i, line) in enumerate(vim.current.buffer):
+            if line.strip() == '{':
+                yield (i+1, line.find('{')+1)
 
-function! WhitespaceFauxPasDisable()
-    if exists('w:trailspace_match')
-        call matchdelete(w:trailspace_match)
-        unlet w:trailspace_match
-    endif
-endfunction
+    vim.command('set foldmethod=manual')
+    vim.command('normal zE') # eliminate all folds
+    win = vim.current.window
+    old_pos = vim.current.window.cursor
 
-if has('gui_running')
-    autocmd WinEnter    * call WhitespaceFauxPasEnable()
-    autocmd InsertLeave * call WhitespaceFauxPasEnable()
-    autocmd InsertEnter * call WhitespaceFauxPasDisable()
-endif
+    for pos in get_fold_starts():
+        win.cursor = pos
+        vim.command('normal zf%zo')
+
+    win.cursor = old_pos
+    vim.command('normal zM')
+endpython
+" }}}
+
+" Display trailing whitespace (but not in insert mode) {{{
+set listchars=trail:\ 
+set list
+autocmd WinEnter    * set list
+autocmd InsertLeave * set list
+autocmd InsertEnter * set nolist
+" }}}
+
+" Normal mode mappings {{{
+" Muscle memory from web browsers
+noremap <C-T> :tabnew<Enter>
+
+let mapleader = ","
+noremap <silent> <leader><cr> :noh<cr>
+noremap <silent> <leader>s :set invspell<cr>
+
+nnoremap <Leader>z :python create_c_folds()<Cr>
+
+" clang-format (use the one with llvm 3.5.0) not the system default
+noremap <Leader>f :pyf /home/tdudziak/llvm/3.5.0/clang-format.py<Cr>
+noremap <Leader>F :%pyf /home/tdudziak/llvm/3.5.0/clang-format.py<Cr>
+noremap <silent> <Leader>K :YcmCompleter GoToDefinition<Cr>
+" }}}
 
 " Enable spell checking by default on git commits.
 autocmd FileType gitcommit setlocal spell
@@ -94,12 +124,4 @@ autocmd FileType gitcommit setlocal spell
 set colorcolumn=80,100
 highlight ColorColumn ctermbg=Black
 
-" Keyword lookup on Shift-K with Hoogle
-autocmd FileType haskell setlocal keywordprg=hoogle\ --info
-autocmd FileType lhaskell setlocal keywordprg=hoogle\ --info
-
-" Include Go stuff (syntax, filetype, ...)
-set rtp+=$GOROOT/misc/vim
-autocmd BufReadPre,BufNewFile *.go set filetype=go fileencoding=utf-8 fileencodings=utf-8
-
-set cmdheight=2
+" vim:set foldmethod=marker:
