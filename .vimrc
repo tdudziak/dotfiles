@@ -93,12 +93,32 @@ def create_c_folds():
 endpython
 " }}}
 
-" Display trailing whitespace (but not in insert mode) {{{
-set listchars=trail:\ 
-set list
-autocmd WinEnter    * set list
-autocmd InsertLeave * set list
-autocmd InsertEnter * set nolist
+" Trailing whitespace marking {{{
+" Do a more sophisticated matching if gui is enabled, use listchars in text
+" mode.
+if has('gui_running')
+    highlight WhitespaceFauxPas ctermbg=Red guibg=tomato
+
+    function! WhitespaceFauxPasEnable()
+        if !exists('w:trailspace_match')
+            let w:trailspace_match = matchadd("WhitespaceFauxPas", "\\s\\+$")
+        endif
+    endfunction
+
+    function! WhitespaceFauxPasDisable()
+        if exists('w:trailspace_match')
+            call matchdelete(w:trailspace_match)
+            unlet w:trailspace_match
+        endif
+    endfunction
+
+    autocmd BufWinEnter * call WhitespaceFauxPasEnable()
+    autocmd InsertLeave * call WhitespaceFauxPasEnable()
+    autocmd InsertEnter * call WhitespaceFauxPasDisable()
+else
+    set listchars=trail:-
+    set list
+endif
 " }}}
 
 " Normal mode mappings {{{
