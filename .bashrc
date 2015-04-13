@@ -3,11 +3,14 @@
 # for examples
 
 # If not running interactively, don't do anything
-[ -z "$PS1" ] && return
+case $- in
+    *i*) ;;
+      *) return;;
+esac
 
-# don't put duplicate lines in the history. See bash(1) for more options
-# ... or force ignoredups and ignorespace
-HISTCONTROL=ignoredups:ignorespace
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+HISTCONTROL=ignoreboth
 
 # append to the history file, don't overwrite it
 shopt -s histappend
@@ -23,25 +26,7 @@ shopt -s checkwinsize
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-# set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
-fi
-
-# set a fancy prompt (non-color, unless we know we "want" color)
-case "$TERM" in
-    xterm-color) color_prompt=yes;;
-esac
-
-if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-    # We have color support; assume it's compliant with Ecma-48
-    # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-    # a case would tend to support setf rather than setaf.)
-    color_prompt=yes
-else
-    color_prompt=
-fi
-
+# command prompt {{{
 # A colorized version of __git_ps1
 function __git_ps1_color {
     status=$(git status --porcelain 2> /dev/null)
@@ -52,21 +37,48 @@ function __git_ps1_color {
     fi
 }
 
-if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\[$(__git_ps1_color)\]$(__git_ps1)\[$(tput sgr0)\]\$ '
-else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w`__git_ps1`\$ '
-fi
-unset color_prompt
+# TODO: use PROMPT_COMMAND instead?
+function build_ps1 {
+    local user_and_project="$USER"
+    [ -n "$PROJECT" ] && user_and_project="$USER#$PROJECT"
 
-# If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
-esac
+    # set the title
+    case "$TERM" in
+    xterm*|rxvt*)
+        echo -en "\033]2;$user_and_project: $(basename $(pwd))\007"
+        ;;
+    *)
+        ;;
+    esac
+
+    # user or user#project_name
+    tput bold
+    tput setaf 3
+    echo -n "$user_and_project"
+
+    tput setaf 4
+    echo -n ":$(pwd)"
+    tput sgr0
+
+    echo -n "$(__git_ps1_color)$(__git_ps1)$(tput sgr0)\$ "
+}
+
+if ! tput setaf 1 >&/dev/null; then
+    # no color support
+    PS1='\u@\h:\w\$ '
+else
+    PS1='$(build_ps1)'
+fi
+# }}}
+
+# project aliases and functions {{{
+alias cdp='cd $PROJECT_ROOT'
+alias cdb='cd $PROJECT_ROOT/build'
+
+function project {
+    source $HOME/projects/$1/.env
+}
+# }}}
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -77,54 +89,21 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
-fi
+# colored GCC warnings and errors
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
-if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
+  fi
 fi
 
-function sanity_check {
-    if [ ! -f "$1" ]; then
-        echo "[$2] Something is wrong: I can't find $1."
-    fi
-}
-
-# Local bins
-export PATH+=:$HOME/bin:$HOME/.cabal/bin
-
-# TVLA environment and settings
-# export TVLA_HOME=$HOME/src/tvla-3.0alpha
-# export PATH+=:$TVLA_HOME/bin
-# sanity_check "$TVLA_HOME/bin/tvla" "tvla"
-
-# Go programming language environment
-# export GOROOT=$HOME/go
-# export PATH=$PATH:$GOROOT/bin
-# sanity_check "$GOROOT/bin/8g" "go"
-
-# Android platform
-# ANDROID_HOME=$HOME/android
-# export PATH+=:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
-# sanity_check "$ANDROID_HOME/tools/android" "android"
-
-# Google C++ Testing Framework
-# export GTEST_DIR="$HOME/src/gtest-1.6.0"
-# sanity_check "$GTEST_DIR/include/gtest/gtest.h"
-
-# Support http://www.catb.org/~esr/BROWSER/
-export BROWSER=/usr/bin/google-chrome
-sanity_check "$BROWSER" "chrome"
-
-unset sanity_check
-
+source /etc/bash_completion.d/git-prompt
 export EDITOR=vim
+
+# vim:set foldmethod=marker:
