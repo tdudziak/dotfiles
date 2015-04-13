@@ -70,26 +70,40 @@ autocmd FileType c call SetOldSchoolTabs()
 "
 " Rather than using foldmethod=syntax, folds are created manually according to
 " certian rules.
+
 python <<endpython
 def create_c_folds():
     import vim
-
-    def get_fold_starts():
-        for (i, line) in enumerate(vim.current.buffer):
-            if line.strip() == '{':
-                yield (i+1, line.find('{')+1)
-
     vim.command('set foldmethod=manual')
     vim.command('normal zE') # eliminate all folds
     win = vim.current.window
-    old_pos = vim.current.window.cursor
 
-    for pos in get_fold_starts():
-        win.cursor = pos
-        vim.command('normal zf%zo')
+    show_next = True
+    to_show = []
+    for (i, line) in enumerate(vim.current.buffer):
+        if line.strip() == '{':
+            pos = (i+1, line.find('{')+1)
+            win.cursor = pos
+            vim.command('normal zf%zo')
+            if show_next:
+                to_show.append(pos)
 
-    win.cursor = old_pos
+        if 'namespace' in line or 'class' in line or 'struct' in line:
+            show_next = True
+        else:
+            show_next = False
+
+    # fold everything
     vim.command('normal zM')
+
+    # unfold folds in `to_show'
+    for pos in to_show:
+        win.cursor = pos
+        vim.command('normal zo')
+
+    # go to the first line
+    # TODO: attempt to restore previous position and scroll state
+    vim.command('normal gg')
 endpython
 " }}}
 
@@ -129,7 +143,7 @@ let mapleader = ","
 noremap <silent> <leader><cr> :noh<cr>
 noremap <silent> <leader>s :set invspell<cr>
 
-nnoremap <Leader>z :python create_c_folds()<Cr>
+nnoremap <silent> <Leader>z :python create_c_folds()<Cr>
 
 " clang-format (use the one with llvm 3.5.0) not the system default
 noremap <Leader>f :pyf /home/tdudziak/llvm/3.5.0/clang-format.py<Cr>
