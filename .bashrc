@@ -27,47 +27,55 @@ shopt -s checkwinsize
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
 # command prompt {{{
-# A colorized version of __git_ps1
 function __git_ps1_color {
-    status=$(git status --porcelain 2> /dev/null)
-    if $(echo "$status" | egrep "^\?\?" > /dev/null); then
+    status="$(git status --porcelain 2> /dev/null)"
+    if $(echo "$status" | egrep "^ (A|M|D)" > /dev/null); then
         tput setaf 1 # red: changes not in index
-    elif $(echo "$status" | egrep "^\w?A|M|D" > /dev/null); then
-        tput setaf 2 # green: changes in index
+    elif $(echo "$status" | egrep "^(A|M|D)" > /dev/null); then
+        tput setaf 2 # green: changes only in index
     fi
 }
 
-# TODO: use PROMPT_COMMAND instead?
-function build_ps1 {
+function __prompt_command {
+    # used both in terminal title and actual prompt
     local user_and_project="$USER"
-    [ -n "$PROJECT" ] && user_and_project="$USER#$PROJECT"
+    [ -n "$PROJECT" ] && user_and_project+="#$PROJECT"
 
-    # set the title
+    PS1=""
+
+    # terminal title
     case "$TERM" in
     xterm*|rxvt*)
-        echo -en "\033]2;$user_and_project: $(basename $(pwd))\007"
+        PS1+="\[\033]2;\]"
+        PS1+="$user_and_project: \w"
+        PS1+="\[\007\]"
         ;;
     *)
         ;;
     esac
 
-    # user or user#project_name
-    tput bold
-    tput setaf 3
-    echo -n "$user_and_project"
+    # main prompt
+    PS1+="\[$(tput bold)$(tput setaf 3)\]"
+    PS1+="$user_and_project"
+    PS1+="\[$(tput setaf 4)\]"
+    PS1+=":\w"
+    PS1+="\[$(tput sgr0)\]"
 
-    tput setaf 4
-    echo -n ":$(pwd)"
-    tput sgr0
+    # git branch and status
+    if type -t __git_ps1 | grep --quiet function; then
+        PS1+="\[$(__git_ps1_color)\]"
+        PS1+="$(__git_ps1)"
+        PS1+="\[$(tput sgr0)\]"
+    fi
 
-    echo -n "$(__git_ps1_color)$(__git_ps1)$(tput sgr0)\$ "
+    PS1+="\$ "
 }
 
 if ! tput setaf 1 >&/dev/null; then
     # no color support
     PS1='\u@\h:\w\$ '
 else
-    PS1='$(build_ps1)'
+    PROMPT_COMMAND=__prompt_command
 fi
 # }}}
 
