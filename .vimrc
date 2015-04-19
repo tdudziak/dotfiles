@@ -107,9 +107,27 @@ def create_c_folds():
 endpython
 " }}}
 
+python <<endpython
+def toggle_c_ptr():
+    import vim
+    (_, i) = vim.current.window.cursor
+    line = vim.current.line
+
+    try:
+        for (a,b) in [(i,i+2), (i-1,i+1)]:
+            if line[a:b] == '->':
+                vim.current.line = line[:a] + '.' + line[b:]
+    except IndexError:
+        pass
+
+    try:
+        if line[i] == '.':
+            vim.current.line = line[:i] + '->' + line[i+1:]
+    except IndexError:
+        pass
+endpython
+
 " Trailing whitespace marking {{{
-" Do a more sophisticated matching if gui is enabled, use listchars in text
-" mode.
 if has('gui_running')
     highlight WhitespaceFauxPas ctermbg=Red guibg=tomato
 
@@ -149,6 +167,7 @@ nnoremap <silent> <Leader>z :python create_c_folds()<Cr>
 noremap <Leader>f :pyf /home/tdudziak/llvm/3.5.0/clang-format.py<Cr>
 noremap <Leader>F :%pyf /home/tdudziak/llvm/3.5.0/clang-format.py<Cr>
 noremap <silent> <Leader>K :YcmCompleter GoToDefinition<Cr>
+noremap <silent> <Leader>p :python toggle_c_ptr()<Cr>
 " }}}
 
 " Enable spell checking by default on git commits.
