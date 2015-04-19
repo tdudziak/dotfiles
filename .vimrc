@@ -36,6 +36,8 @@ call vundle#end()
 filetype plugin indent on
 " }}}
 
+let g:ctrlp_switch_buffer = '0'
+
 " YouCompleteMe setup {{{
 " use the Debian package
 set rtp+=/usr/share/vim-youcompleteme/
@@ -105,6 +107,8 @@ def create_c_folds():
     # TODO: attempt to restore previous position and scroll state
     vim.command('normal gg')
 endpython
+
+autocmd FileType cpp python create_c_folds()
 " }}}
 
 python <<endpython
@@ -147,9 +151,6 @@ if has('gui_running')
     autocmd BufWinEnter * call WhitespaceFauxPasEnable()
     autocmd InsertLeave * call WhitespaceFauxPasEnable()
     autocmd InsertEnter * call WhitespaceFauxPasDisable()
-else
-    set listchars=trail:-
-    set list
 endif
 " }}}
 
@@ -164,8 +165,8 @@ noremap <silent> <leader>s :set invspell<cr>
 nnoremap <silent> <Leader>z :python create_c_folds()<Cr>
 
 " clang-format (use the one with llvm 3.5.0) not the system default
-noremap <Leader>f :pyf /home/tdudziak/llvm/3.5.0/clang-format.py<Cr>
-noremap <Leader>F :%pyf /home/tdudziak/llvm/3.5.0/clang-format.py<Cr>
+noremap <silent> <Leader>f :pyf /home/tdudziak/llvm/3.5.0/clang-format.py<Cr>
+noremap <silent> <Leader>F :%pyf /home/tdudziak/llvm/3.5.0/clang-format.py<Cr>
 noremap <silent> <Leader>K :YcmCompleter GoToDefinition<Cr>
 noremap <silent> <Leader>p :python toggle_c_ptr()<Cr>
 " }}}
