@@ -31,6 +31,7 @@ Plugin 'gmarik/Vundle.vim'
 Plugin 'tpope/vim-fugitive'
 Plugin 'kien/ctrlp.vim'
 Plugin 'altercation/vim-colors-solarized.git'
+Plugin 'justincampbell/vim-railscasts'
 call vundle#end()
 filetype plugin indent on
 " }}}
@@ -43,8 +44,7 @@ let g:ycm_enable_diagnostic_signs=0
 " }}}
 
 if has('gui_running') " {{{
-    set background=light
-    colorscheme solarized
+    colorscheme railscasts
     set guioptions-=m
     set guioptions-=T
     set guifont=DejaVu\ Sans\ Mono\ 10
