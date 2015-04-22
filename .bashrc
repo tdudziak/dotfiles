@@ -114,4 +114,6 @@ fi
 source /etc/bash_completion.d/git-prompt
 export EDITOR=vim
 
+alias fuck='(set -x; su -c "$(history -p \!\!)")'
+
 # vim:set foldmethod=marker:
