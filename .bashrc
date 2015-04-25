@@ -54,6 +54,9 @@ function __prompt_command {
         ;;
     esac
 
+    # tmux window title
+    [ -n "$TMUX_PANE" ] && tmux rename-window -t "$TMUX_PANE" "$user_and_project"
+
     # main prompt
     PS1+="\[$(tput bold)$(tput setaf 3)\]"
     PS1+="$user_and_project"
