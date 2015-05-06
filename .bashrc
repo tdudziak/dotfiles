@@ -46,9 +46,7 @@ function __prompt_command {
     # terminal title
     case "$TERM" in
     xterm*|rxvt*)
-        PS1+="\[\033]2;\]"
-        PS1+="$user_and_project: \w"
-        PS1+="\[\007\]"
+        PS1+="\[\033]2;$user_and_project: \w\007\]"
         ;;
     *)
         ;;
