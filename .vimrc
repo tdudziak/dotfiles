@@ -28,6 +28,7 @@ filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
+Plugin 'Valloric/YouCompleteMe'
 Plugin 'tpope/vim-fugitive'
 Plugin 'kien/ctrlp.vim'
 Plugin 'altercation/vim-colors-solarized.git'
@@ -42,16 +43,17 @@ let g:ctrlp_custom_ignore = '\v[\/](\.git|\.hg|\.svn|build)$'
 set wildignore=*~
 
 " YouCompleteMe setup {{{
-" use the Debian package
-set rtp+=/usr/share/vim-youcompleteme/
 let g:ycm_auto_trigger=0
 let g:ycm_enable_diagnostic_signs=0
+let g:ycm_autoclose_preview_window_after_insertion=1
+let g:ycm_show_diagnostics_ui=0
 " }}}
 
 if has('gui_running') " {{{
     colorscheme railscasts
-    set guioptions-=m
     set guioptions-=T
+    set guioptions-=m
+    set guioptions+=c
     set guifont=DejaVu\ Sans\ Mono\ 10
 endif " }}}
 
@@ -171,8 +173,8 @@ nnoremap <silent> <Leader>z :python create_c_folds()<Cr>
 " clang-format (use the one with llvm 3.6.0) not the system default
 noremap <silent> <Leader>f :pyf /home/tdudziak/llvm/3.6.0/clang-format.py<Cr>
 noremap <silent> <Leader>F :%pyf /home/tdudziak/llvm/3.6.0/clang-format.py<Cr>
-noremap <silent> <Leader>K :YcmCompleter GoToDefinition<Cr>
-noremap <silent> <Leader>p :python toggle_c_ptr()<Cr>
+noremap <silent> <Leader>K :YcmCompleter GetDoc<Cr>
+noremap <silent> <Leader>p :pclose<Cr>
 " }}}
 
 " Enable spell checking by default on git commits.
