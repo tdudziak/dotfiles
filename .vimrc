@@ -32,11 +32,14 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'kien/ctrlp.vim'
 Plugin 'altercation/vim-colors-solarized.git'
 Plugin 'justincampbell/vim-railscasts'
+Plugin 'rust-lang/rust.vim'
 call vundle#end()
 filetype plugin indent on
 " }}}
 
 let g:ctrlp_switch_buffer = '0'
+let g:ctrlp_custom_ignore = '\v[\/](\.git|\.hg|\.svn|build)$'
+set wildignore=*~
 
 " YouCompleteMe setup {{{
 " use the Debian package
@@ -70,8 +73,8 @@ autocmd FileType c call SetOldSchoolTabs()
 
 " Fold helper for C an C++ {{{
 "
-" Rather than using foldmethod=syntax, folds are created manually according to
-" certian rules.
+" Rather than using foldmethod=syntax, manual-mode folds are created according
+" to certian rules.
 
 python <<endpython
 def create_c_folds():
@@ -90,7 +93,8 @@ def create_c_folds():
             if show_next:
                 to_show.append(pos)
 
-        if 'namespace' in line or 'class' in line or 'struct' in line:
+        toks = line.split() # TODO: better tokenization
+        if 'namespace' in toks or 'class' in toks or 'struct' in toks:
             show_next = True
         else:
             show_next = False
@@ -164,9 +168,9 @@ noremap <silent> <leader>s :set invspell<cr>
 
 nnoremap <silent> <Leader>z :python create_c_folds()<Cr>
 
-" clang-format (use the one with llvm 3.5.0) not the system default
-noremap <silent> <Leader>f :pyf /home/tdudziak/llvm/3.5.0/clang-format.py<Cr>
-noremap <silent> <Leader>F :%pyf /home/tdudziak/llvm/3.5.0/clang-format.py<Cr>
+" clang-format (use the one with llvm 3.6.0) not the system default
+noremap <silent> <Leader>f :pyf /home/tdudziak/llvm/3.6.0/clang-format.py<Cr>
+noremap <silent> <Leader>F :%pyf /home/tdudziak/llvm/3.6.0/clang-format.py<Cr>
 noremap <silent> <Leader>K :YcmCompleter GoToDefinition<Cr>
 noremap <silent> <Leader>p :python toggle_c_ptr()<Cr>
 " }}}
