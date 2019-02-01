@@ -1,3 +1,16 @@
+" Leader-key shortcuts:
+"
+"     f       clang-format: local
+"     F       clang-format: whole buffer
+"     K       YCM: declaration/documentation in preview window
+"     p       close the preview window
+"     s       toggle spellchecker
+"     z       set up custom C/C++ folds
+"     Enter   clear search highlighting
+"
+"
+"
+
 " Basics {{{
 set nocompatible
 
@@ -28,12 +41,14 @@ filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
-Plugin 'Valloric/YouCompleteMe'
+" Plugin 'Valloric/YouCompleteMe'
 Plugin 'tpope/vim-fugitive'
-Plugin 'kien/ctrlp.vim'
+Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'altercation/vim-colors-solarized.git'
 Plugin 'justincampbell/vim-railscasts'
 Plugin 'rust-lang/rust.vim'
+Plugin 'leafgarland/typescript-vim'
+Plugin 'udalov/kotlin-vim'
 call vundle#end()
 filetype plugin indent on
 " }}}
@@ -78,7 +93,7 @@ autocmd FileType c call SetOldSchoolTabs()
 " Rather than using foldmethod=syntax, manual-mode folds are created according
 " to certian rules.
 
-python <<endpython
+python3 <<endpython
 def create_c_folds():
     import vim
     vim.command('set foldmethod=manual')
@@ -114,10 +129,10 @@ def create_c_folds():
     vim.command('normal gg')
 endpython
 
-autocmd FileType cpp python create_c_folds()
+autocmd FileType cpp python3 create_c_folds()
 " }}}
 
-python <<endpython
+python3 <<endpython
 def toggle_c_ptr():
     import vim
     (_, i) = vim.current.window.cursor
@@ -168,13 +183,19 @@ let mapleader = ","
 noremap <silent> <leader><cr> :noh<cr>
 noremap <silent> <leader>s :set invspell<cr>
 
-nnoremap <silent> <Leader>z :python create_c_folds()<Cr>
+nnoremap <silent> <Leader>z :python3 create_c_folds()<Cr>
 
 " clang-format (use the one with llvm 3.6.0) not the system default
-noremap <silent> <Leader>f :pyf /home/tdudziak/llvm/3.6.0/clang-format.py<Cr>
-noremap <silent> <Leader>F :%pyf /home/tdudziak/llvm/3.6.0/clang-format.py<Cr>
+noremap <silent> <Leader>f :py3file /home/tdudziak/.local/share/clang-format.py<Cr>
+noremap <silent> <Leader>F :%py3file /home/tdudziak/.local/share/clang-format.py<Cr>
 noremap <silent> <Leader>K :YcmCompleter GetDoc<Cr>
 noremap <silent> <Leader>p :pclose<Cr>
+
+" short help screen for leader shortcuts (at the top of .vimrc)
+noremap <silent> <Leader>h :pedit! $HOME/.vimrc<Cr>
+
+" copy current file and location to clipboard
+noremap <silent> <Leader>l :let @+ = expand('%:p') . ":" . line('.')<Cr>
 " }}}
 
 " Enable spell checking by default on git commits.
@@ -183,5 +204,14 @@ autocmd FileType gitcommit setlocal spell
 " Mark 80 and 100 column.
 set colorcolumn=80,100
 highlight ColorColumn ctermbg=Black
+
+set nojoinspaces
+
+" Pasting the secondary selection can be done with (WARNING: has problems):
+"    bash -c "xdotool type --clearmodifiers -- \"`xclip -o -selection secondary`\""
+" To copy from secondary to the main clipboard:
+"    sh -c "xclip -o -selection secondary | xclip -i -selection clipboard"
+"
+" autocmd FocusLost * silent exec "!echo -n '" . expand('%:p') . ":" . line('.') . "' | xclip -i -selection secondary"
 
 " vim:set foldmethod=marker:
