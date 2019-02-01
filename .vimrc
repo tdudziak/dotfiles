@@ -179,6 +179,10 @@ endif
 " Muscle memory from web browsers
 noremap <C-T> :tabnew<Enter>
 
+" splitting similar to tmux
+noremap <C-w>% :vsplit<Enter>
+noremap <C-w>" :split<Enter>
+
 let mapleader = ","
 noremap <silent> <leader><cr> :noh<cr>
 noremap <silent> <leader>s :set invspell<cr>
