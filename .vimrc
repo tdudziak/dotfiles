@@ -41,13 +41,14 @@ filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
-" Plugin 'Valloric/YouCompleteMe'
 Plugin 'tpope/vim-fugitive'
 Plugin 'phleet/vim-mercenary'
 Plugin 'ctrlpvim/ctrlp.vim'
-Plugin 'altercation/vim-colors-solarized.git'
-Plugin 'justincampbell/vim-railscasts'
 Plugin 'rust-lang/rust.vim'
+" Plugin 'Valloric/YouCompleteMe'
+Plugin 'vim-scripts/darktango.vim'
+Plugin 'justincampbell/vim-railscasts'
+Plugin 'altercation/vim-colors-solarized.git'
 call vundle#end()
 filetype plugin indent on
 " }}}
@@ -94,7 +95,7 @@ function! SetOldSchoolTabs()
     setlocal shiftwidth=8
 endfunction
 " Enable old-school tabs for C
-autocmd FileType c call SetOldSchoolTabs()
+" autocmd FileType c call SetOldSchoolTabs()
 " }}}
 
 " Fold helper for C an C++ {{{
@@ -105,40 +106,65 @@ autocmd FileType c call SetOldSchoolTabs()
 python3 <<endpython
 def create_c_folds():
     import vim
+    KEYWORDS = ['namespace', 'class', 'struct', 'enum', 'union']
+
     vim.command('set foldmethod=manual')
     vim.command('normal zE') # eliminate all folds
     win = vim.current.window
+    initial_pos = win.cursor
 
-    show_next = True
-    to_show = []
+    # decision to create a fold and leave it open/closed will be made based
+    # on these criteria applied to the current and previous line
+    class Crit:
+        def __init__(self, line):
+            tokens = line.split() # TODO: better tokenization
+            self.has_keyword = len(set(tokens).intersection(KEYWORDS)) > 0
+            self.starts_keyword = len(tokens) > 0 and tokens[0] in KEYWORDS
+            self.has_open = '{' in line
+            self.only_open = line.strip() == '{'
+            self.empty = len(line.strip()) == 0
+
+    folds = [] # (fold start pos, fold end pos, True if folded by default)
+    prev = None
+
     for (i, line) in enumerate(vim.current.buffer):
-        if line.strip() == '{':
-            pos = (i+1, line.find('{')+1)
-            win.cursor = pos
-            vim.command('normal zf%zo')
-            if show_next:
-                to_show.append(pos)
+        crit = Crit(line)
+        if prev is None:
+            prev = crit
+            continue
 
-        toks = line.split() # TODO: better tokenization
-        if 'namespace' in toks or 'class' in toks or 'struct' in toks:
-            show_next = True
-        else:
-            show_next = False
+        create_fold = (crit.has_open and crit.has_keyword) or crit.only_open
+        unfold_by_default = \
+               crit.has_keyword \
+            or (prev.starts_keyword and crit.only_open) \
+            or (prev.empty and crit.only_open)
 
-    # fold everything
-    vim.command('normal zM')
+        if create_fold:
+            fold_start_pos = (i+1, line.find('{')+1)
+            win.cursor = fold_start_pos
+            vim.command('normal %')
+            folds.append((fold_start_pos, win.cursor, unfold_by_default))
+            win.cursor = fold_start_pos
 
-    # unfold folds in `to_show'
-    for pos in to_show:
-        win.cursor = pos
-        vim.command('normal zo')
+        prev = crit
 
-    # go to the first line
-    # TODO: attempt to restore previous position and scroll state
-    vim.command('normal gg')
+    # create all folds
+    for (start_pos, end_pos, _) in folds:
+        vim.command('%d,%dfold' % (start_pos[0], end_pos[0]))
+        vim.command('normal zR')
+
+    # fold what needs to be folded by default
+    folds.sort(reverse=True)
+    for (start_pos, _, leave_open) in folds:
+        if not leave_open:
+            vim.command('%dfoldclose' % start_pos[0])
+
+    # attempt to restore previous position
+    win.cursor = initial_pos
 endpython
 
 autocmd FileType cpp python3 create_c_folds()
+autocmd FileType c python3 create_c_folds()
 " }}}
 
 python3 <<endpython
