@@ -43,19 +43,28 @@ call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 " Plugin 'Valloric/YouCompleteMe'
 Plugin 'tpope/vim-fugitive'
+Plugin 'phleet/vim-mercenary'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'altercation/vim-colors-solarized.git'
 Plugin 'justincampbell/vim-railscasts'
 Plugin 'rust-lang/rust.vim'
-Plugin 'leafgarland/typescript-vim'
-Plugin 'udalov/kotlin-vim'
 call vundle#end()
 filetype plugin indent on
 " }}}
 
+" Ctrl-P setup {{{
 let g:ctrlp_switch_buffer = '0'
-let g:ctrlp_custom_ignore = '\v[\/](\.git|\.hg|\.svn|build)$'
+let g:ctrlp_custom_ignore = '\v[\/](\.git|\.hg|\.svn|build|doc)$'
 set wildignore=*~
+
+if executable('ag')
+  " Use Ag over Grep
+  set grepprg=ag\ --nogroup\ --nocolor
+
+  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+endif
+" }}}
 
 " YouCompleteMe setup {{{
 let g:ycm_auto_trigger=0
@@ -69,7 +78,7 @@ if has('gui_running') " {{{
     set guioptions-=T
     set guioptions-=m
     set guioptions+=c
-    set guifont=DejaVu\ Sans\ Mono\ 10
+    set guifont=Inconsolata\ Medium\ 10
 endif " }}}
 
 " Tabs and indentation setup {{{
@@ -188,10 +197,13 @@ noremap <silent> <leader><cr> :noh<cr>
 noremap <silent> <leader>s :set invspell<cr>
 
 nnoremap <silent> <Leader>z :python3 create_c_folds()<Cr>
+nnoremap <silent> <Leader>l :let @+ = expand('%:p') . ':' . line('.')<Cr>
+nnoremap <silent> <Leader>d :r! date +\%Y-\%m-\%d:<Cr>
+nnoremap <silent> <Leader>b ifrom IPython import embed; embed()<Cr><Esc>
 
 " clang-format (use the one with llvm 3.6.0) not the system default
-noremap <silent> <Leader>f :py3file /home/tdudziak/.local/share/clang-format.py<Cr>
-noremap <silent> <Leader>F :%py3file /home/tdudziak/.local/share/clang-format.py<Cr>
+noremap <silent> <Leader>f :py3file /usr/share/clang/clang-format-5.0/clang-format.py<Cr>
+noremap <silent> <Leader>F :%py3file /usr/share/clang/clang-format-5.0/clang-format.py<Cr>
 noremap <silent> <Leader>K :YcmCompleter GetDoc<Cr>
 noremap <silent> <Leader>p :pclose<Cr>
 
