@@ -1,7 +1,7 @@
 # prompt and tmux pane title {{{
 function __update_tmux_pane {
     pane_title=""
-    if [ -n "TMUX_PANE" ]; then
+    if [ -n "$TMUX_PANE" ]; then
         [ -n "$PROJECT" ] && pane_title="[$PROJECT]:"
         pane_title+="$PWD"
         [ -n "$1" ] && pane_title+=" ($1)"
@@ -31,9 +31,12 @@ alias cdb='cd "$PROJECT_ROOT/build"'
 
 function project {
     source "$HOME/projects/$1/.env"
+    export PROJECT
+    export PROJECT_ROOT
 }
 # }}}
 
+[ -n "$PROJECT" ] && source "$HOME/projects/$PROJECT/.env"
 export EDITOR=vim
 
 # vim:set foldmethod=marker:
